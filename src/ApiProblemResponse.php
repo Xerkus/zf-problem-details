@@ -7,41 +7,44 @@
 
 namespace ZF\ApiProblem;
 
-use Zend\Http\Response;
+use Zend\Diactoros\Response;
+use Zend\Diactoros\Stream;
+use Zend\Diactoros\Response\InjectContentTypeTrait;
 
 /**
  * Represents an ApiProblem response payload.
  */
 class ApiProblemResponse extends Response
 {
+    use InjectContentTypeTrait;
+
     /**
      * @var ApiProblem
      */
-    protected $apiProblem;
-
-    /**
-     * Flags to use with json_encode.
-     *
-     * @var int
-     */
-    protected $jsonFlags;
+    private $apiProblem;
 
     /**
      * @param ApiProblem $apiProblem
      */
-    public function __construct(ApiProblem $apiProblem)
+    public function __construct(ApiProblem $apiProblem, array $headers = [])
     {
-        $this->apiProblem = $apiProblem;
-        $this->setCustomStatusCode($apiProblem->status);
-        $this->setReasonPhrase($apiProblem->title);
+        $body = new Stream('php://temp', 'wb+');
 
-        $this->jsonFlags = JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR;
+        $jsonFlags = JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR;
+        $body->write(json_encode($apiProblem->toArray(), $jsonFlags));
+        $body->rewind();
+
+        $headers = $this->injectContentType(ApiProblem::CONTENT_TYPE, $headers);
+
+        $this->apiProblem = $apiProblem;
+
+        parent::__construct($body, $apiProblem->status, $headers);
     }
 
     /**
      * @return ApiProblem
      */
-    public function getApiProblem()
+    public function getApiProblem() : ApiProblem
     {
         return $this->apiProblem;
     }
@@ -51,29 +54,12 @@ class ApiProblemResponse extends Response
      *
      * Serializes the composed ApiProblem instance to JSON.
      *
+     * @deprecated Since 2.0
      * @return string
      */
     public function getContent()
     {
-        return json_encode($this->apiProblem->toArray(), $this->jsonFlags);
-    }
-
-    /**
-     * Retrieve headers.
-     *
-     * Proxies to parent class, but then checks if we have an content-type
-     * header; if not, sets it, with a value of "application/problem+json".
-     *
-     * @return \Zend\Http\Headers
-     */
-    public function getHeaders()
-    {
-        $headers = parent::getHeaders();
-        if (! $headers->has('content-type')) {
-            $headers->addHeaderLine('content-type', ApiProblem::CONTENT_TYPE);
-        }
-
-        return $headers;
+        return $this->getBody()->getContents();
     }
 
     /**
@@ -84,16 +70,10 @@ class ApiProblemResponse extends Response
      *
      * @return string
      */
-    public function getReasonPhrase()
+    public function getReasonPhrase() : string
     {
-        if (! empty($this->reasonPhrase)) {
-            return $this->reasonPhrase;
-        }
-
-        if (isset($this->recommendedReasonPhrases[$this->statusCode])) {
-            return $this->recommendedReasonPhrases[$this->statusCode];
-        }
-
-        return 'Unknown Error';
+        return $this->getApiProblem()->title
+            ?? parent::getReasonPhrase()
+            ?? 'Unknown Error';
     }
 }

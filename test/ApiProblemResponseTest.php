@@ -10,18 +10,16 @@ namespace ZFTest\ApiProblem;
 use PHPUnit_Framework_TestCase as TestCase;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\ApiProblemResponse;
+use Psr\Http\Message\ResponseInterface;
 
 class ApiProblemResponseTest extends TestCase
 {
-    public function testApiProblemResponseIsAnHttpResponse()
+    public function testApiProblemResponseIsAnPsr7Response()
     {
         $response = new ApiProblemResponse(new ApiProblem(400, 'Random error'));
-        $this->assertInstanceOf('Zend\Http\Response', $response);
+        $this->assertInstanceOf(ResponseInterface::class, $response);
     }
 
-    /**
-     * @depends testApiProblemResponseIsAnHttpResponse
-     */
     public function testApiProblemResponseSetsStatusCodeAndReasonPhrase()
     {
         $response = new ApiProblemResponse(new ApiProblem(400, 'Random error'));
@@ -50,17 +48,13 @@ class ApiProblemResponseTest extends TestCase
         $this->assertEquals($expected, json_decode($response->getContent(), true));
     }
 
-    /**
-     * @depends testApiProblemResponseIsAnHttpResponse
-     */
     public function testApiProblemResponseSetsContentTypeHeader()
     {
         $response = new ApiProblemResponse(new ApiProblem(400, 'Random error'));
-        $headers  = $response->getHeaders();
-        $this->assertTrue($headers->has('content-type'));
-        $header = $headers->get('content-type');
-        $this->assertInstanceOf('Zend\Http\Header\ContentType', $header);
-        $this->assertEquals(ApiProblem::CONTENT_TYPE, $header->getFieldValue());
+        $this->assertTrue($response->hasHeader('content-type'));
+        $header = $response->getHeader('content-type');
+        $this->count(1, $header);
+        $this->assertEquals(ApiProblem::CONTENT_TYPE, $header[0]);
     }
 
     public function testComposeApiProblemIsAccessible()
