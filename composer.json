@@ -1,14 +1,13 @@
 {
-    "name": "zfcampus/zf-api-problem",
-    "description": "ZF2 Module providing API-Problem assets and rendering",
+    "name": "zfcampus/zf-problem-detail",
+    "description": "PSR7 implementation for RFC 7807 Problem Details for HTTP APIs",
     "type": "library",
     "license": "BSD-3-Clause",
     "keywords": [
-        "zf2",
         "zend",
-        "module",
+        "middleware",
         "rest",
-        "api-problem"
+        "problem-details"
     ],
     "homepage": "http://apigility.org/",
     "support": {
@@ -19,11 +18,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.2-dev",
-            "dev-develop": "1.3-dev"
+            "dev-master": "1.0-dev",
+            "dev-develop": "1.0-dev"
         },
         "zf": {
-            "module": "ZF\\ApiProblem"
+            "config-provider": "ZF\\ProblemDetails\\ConfigProvider"
         }
     },
     "require": {
@@ -43,12 +42,12 @@
     },
     "autoload": {
         "psr-4": {
-            "ZF\\ApiProblem\\": "src/"
+            "ZF\\ProblemDetails\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "ZFTest\\ApiProblem\\": "test/"
+            "ZFTest\\ProblemDetails\\": "test/"
         }
     },
     "scripts": {
