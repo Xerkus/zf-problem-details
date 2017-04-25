@@ -5,7 +5,9 @@
  * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-namespace ZF\ApiProblem\Exception;
+declare(strict_types = 1);
+
+namespace ZF\ProblemDetails\Exception;
 
 /**
  * Marker interface; catch this to catch any module-specific exception.

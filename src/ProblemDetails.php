@@ -5,17 +5,19 @@
  * @copyright Copyright (c) 2014-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-namespace ZF\ApiProblem;
+declare(strict_types = 1);
+
+namespace ZF\ProblemDetails;
 
 use Exception;
 use Throwable;
-use ZF\ApiProblem\Exception\InvalidArgumentException;
-use ZF\ApiProblem\Exception\ProblemExceptionInterface;
+use ZF\ProblemDetails\Exception\InvalidArgumentException;
+use ZF\ProblemDetails\Exception\ProblemExceptionInterface;
 
 /**
  * Object describing an API-Problem payload.
  */
-class ApiProblem
+class ProblemDetails
 {
     /**
      * Content type for api problem response
@@ -223,7 +225,7 @@ class ApiProblem
      * stack trace and previous exception information.
      *
      * @param bool $flag
-     * @return ApiProblem
+     * @return ProblemDetails
      */
     public function setDetailIncludesStackTrace($flag)
     {

@@ -31,7 +31,8 @@
         "http-interop/http-middleware": "^0.4.1",
         "psr/container": "^1.0",
         "psr/http-message": "^1.0",
-        "zendframework/zend-diactoros": "^1.4"
+        "zendframework/zend-diactoros": "^1.4",
+        "zendframework/zend-config-aggregator": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.0",

@@ -5,28 +5,30 @@
  * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-namespace ZF\ApiProblem;
+declare(strict_types = 1);
+
+namespace ZF\ProblemDetails;
 
 use Zend\Diactoros\Response;
 use Zend\Diactoros\Stream;
 use Zend\Diactoros\Response\InjectContentTypeTrait;
 
 /**
- * Represents an ApiProblem response payload.
+ * Represents an ProblemDetails response payload.
  */
-class ApiProblemResponse extends Response
+class ProblemDetailsResponse extends Response
 {
     use InjectContentTypeTrait;
 
     /**
-     * @var ApiProblem
+     * @var ProblemDetails
      */
     private $apiProblem;
 
     /**
-     * @param ApiProblem $apiProblem
+     * @param ProblemDetails $apiProblem
      */
-    public function __construct(ApiProblem $apiProblem, array $headers = [])
+    public function __construct(ProblemDetails $apiProblem, array $headers = [])
     {
         $body = new Stream('php://temp', 'wb+');
 
@@ -34,7 +36,7 @@ class ApiProblemResponse extends Response
         $body->write(json_encode($apiProblem->toArray(), $jsonFlags));
         $body->rewind();
 
-        $headers = $this->injectContentType(ApiProblem::CONTENT_TYPE, $headers);
+        $headers = $this->injectContentType(ProblemDetails::CONTENT_TYPE, $headers);
 
         $this->apiProblem = $apiProblem;
 
@@ -42,9 +44,9 @@ class ApiProblemResponse extends Response
     }
 
     /**
-     * @return ApiProblem
+     * @return ProblemDetails
      */
-    public function getApiProblem() : ApiProblem
+    public function getProblemDetails() : ProblemDetails
     {
         return $this->apiProblem;
     }
@@ -52,7 +54,7 @@ class ApiProblemResponse extends Response
     /**
      * Retrieve the content.
      *
-     * Serializes the composed ApiProblem instance to JSON.
+     * Serializes the composed ProblemDetails instance to JSON.
      *
      * @deprecated Since 2.0
      * @return string
@@ -72,7 +74,7 @@ class ApiProblemResponse extends Response
      */
     public function getReasonPhrase() : string
     {
-        return $this->getApiProblem()->title
+        return $this->getProblemDetails()->title
             ?? parent::getReasonPhrase()
             ?? 'Unknown Error';
     }

@@ -5,14 +5,21 @@
  * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-namespace ZFTest\ApiProblem;
+declare(strict_types = 1);
 
-use PHPUnit_Framework_TestCase as TestCase;
+namespace ZFTest\ProblemDetails;
+
+use PHPUnit\Framework\TestCase;
 use ReflectionObject;
-use ZF\ApiProblem\ApiProblem;
-use ZF\ApiProblem\Exception;
+use ZF\ProblemDetails\ProblemDetails;
+use ZF\ProblemDetails\Exception;
 
-class ApiProblemTest extends TestCase
+/**
+ *
+ * @coversDefaultClass ZF\ProblemDetails\ProblemDetails
+ * @covers ::<!public>
+ */
+class ProblemDetailsTest extends TestCase
 {
     public function statusCodes()
     {
@@ -34,7 +41,7 @@ class ApiProblemTest extends TestCase
      */
     public function testStatusIsUsedVerbatim($status)
     {
-        $apiProblem = new ApiProblem($status, 'foo');
+        $apiProblem = new ProblemDetails($status, 'foo');
         $payload = $apiProblem->toArray();
         $this->assertArrayHasKey('status', $payload);
         $this->assertEquals($status, $payload['status']);
@@ -46,7 +53,7 @@ class ApiProblemTest extends TestCase
     public function testErrorAsDetails()
     {
         $error = new \TypeError('error message', 705);
-        $apiProblem = new ApiProblem(500, $error);
+        $apiProblem = new ProblemDetails(500, $error);
         $payload = $apiProblem->toArray();
 
         $this->assertArrayHasKey('title', $payload);
@@ -60,7 +67,7 @@ class ApiProblemTest extends TestCase
     public function testExceptionCodeIsUsedForStatus()
     {
         $exception = new \Exception('exception message', 401);
-        $apiProblem = new ApiProblem('500', $exception);
+        $apiProblem = new ProblemDetails('500', $exception);
         $payload = $apiProblem->toArray();
         $this->assertArrayHasKey('status', $payload);
         $this->assertEquals($exception->getCode(), $payload['status']);
@@ -68,7 +75,7 @@ class ApiProblemTest extends TestCase
 
     public function testDetailStringIsUsedVerbatim()
     {
-        $apiProblem = new ApiProblem('500', 'foo');
+        $apiProblem = new ProblemDetails('500', 'foo');
         $payload = $apiProblem->toArray();
         $this->assertArrayHasKey('detail', $payload);
         $this->assertEquals('foo', $payload['detail']);
@@ -77,7 +84,7 @@ class ApiProblemTest extends TestCase
     public function testExceptionMessageIsUsedForDetail()
     {
         $exception = new \Exception('exception message');
-        $apiProblem = new ApiProblem('500', $exception);
+        $apiProblem = new ProblemDetails('500', $exception);
         $payload = $apiProblem->toArray();
         $this->assertArrayHasKey('detail', $payload);
         $this->assertEquals($exception->getMessage(), $payload['detail']);
@@ -86,7 +93,7 @@ class ApiProblemTest extends TestCase
     public function testExceptionsCanTriggerInclusionOfStackTraceInDetails()
     {
         $exception = new \Exception('exception message');
-        $apiProblem = new ApiProblem('500', $exception);
+        $apiProblem = new ProblemDetails('500', $exception);
         $apiProblem->setDetailIncludesStackTrace(true);
         $payload = $apiProblem->toArray();
         $this->assertArrayHasKey('trace', $payload);
@@ -97,9 +104,9 @@ class ApiProblemTest extends TestCase
     public function testExceptionsCanTriggerInclusionOfNestedExceptions()
     {
         $exceptionChild = new \Exception('child exception');
-        $exceptionParent = new \Exception('parent exception', null, $exceptionChild);
+        $exceptionParent = new \Exception('parent exception', 0, $exceptionChild);
 
-        $apiProblem = new ApiProblem('500', $exceptionParent);
+        $apiProblem = new ProblemDetails('500', $exceptionParent);
         $apiProblem->setDetailIncludesStackTrace(true);
         $payload = $apiProblem->toArray();
         $this->assertArrayHasKey('exception_stack', $payload);
@@ -116,7 +123,7 @@ class ApiProblemTest extends TestCase
 
     public function testTypeUrlIsUsedVerbatim()
     {
-        $apiProblem = new ApiProblem('500', 'foo', 'http://status.dev:8080/details.md');
+        $apiProblem = new ProblemDetails('500', 'foo', 'http://status.dev:8080/details.md');
         $payload = $apiProblem->toArray();
         $this->assertArrayHasKey('type', $payload);
         $this->assertEquals('http://status.dev:8080/details.md', $payload['type']);
@@ -137,7 +144,7 @@ class ApiProblemTest extends TestCase
      */
     public function testKnownStatusResultsInKnownTitle($status)
     {
-        $apiProblem = new ApiProblem($status, 'foo');
+        $apiProblem = new ProblemDetails($status, 'foo');
         $r = new ReflectionObject($apiProblem);
         $p = $r->getProperty('problemStatusTitles');
         $p->setAccessible(true);
@@ -150,7 +157,7 @@ class ApiProblemTest extends TestCase
 
     public function testUnknownStatusResultsInUnknownTitle()
     {
-        $apiProblem = new ApiProblem(420, 'foo');
+        $apiProblem = new ProblemDetails(420, 'foo');
         $payload = $apiProblem->toArray();
         $this->assertArrayHasKey('title', $payload);
         $this->assertEquals('Unknown', $payload['title']);
@@ -158,7 +165,7 @@ class ApiProblemTest extends TestCase
 
     public function testProvidedTitleIsUsedVerbatim()
     {
-        $apiProblem = new ApiProblem('500', 'foo', 'http://status.dev:8080/details.md', 'some title');
+        $apiProblem = new ProblemDetails('500', 'foo', 'http://status.dev:8080/details.md', 'some title');
         $payload = $apiProblem->toArray();
         $this->assertArrayHasKey('title', $payload);
         $this->assertEquals('some title', $payload['title']);
@@ -166,7 +173,7 @@ class ApiProblemTest extends TestCase
 
     public function testCanPassArbitraryDetailsToConstructor()
     {
-        $problem = new ApiProblem(
+        $problem = new ProblemDetails(
             400,
             'Invalid input',
             'http://example.com/api/problem/400',
@@ -178,7 +185,7 @@ class ApiProblemTest extends TestCase
 
     public function testArraySerializationIncludesArbitraryDetails()
     {
-        $problem = new ApiProblem(
+        $problem = new ProblemDetails(
             400,
             'Invalid input',
             'http://example.com/api/problem/400',
@@ -192,7 +199,7 @@ class ApiProblemTest extends TestCase
 
     public function testArbitraryDetailsShouldNotOverwriteRequiredFieldsInArraySerialization()
     {
-        $problem = new ApiProblem(
+        $problem = new ProblemDetails(
             400,
             'Invalid input',
             'http://example.com/api/problem/400',
@@ -208,7 +215,7 @@ class ApiProblemTest extends TestCase
     {
         $exception = new Exception\DomainException('exception message', 401);
         $exception->setTitle('problem title');
-        $apiProblem = new ApiProblem('401', $exception);
+        $apiProblem = new ProblemDetails('401', $exception);
         $payload = $apiProblem->toArray();
         $this->assertArrayHasKey('title', $payload);
         $this->assertEquals($exception->getTitle(), $payload['title']);
@@ -218,7 +225,7 @@ class ApiProblemTest extends TestCase
     {
         $exception = new Exception\DomainException('exception message', 401);
         $exception->setType('http://example.com/api/help/401');
-        $apiProblem = new ApiProblem('401', $exception);
+        $apiProblem = new ProblemDetails('401', $exception);
         $payload = $apiProblem->toArray();
         $this->assertArrayHasKey('type', $payload);
         $this->assertEquals($exception->getType(), $payload['type']);
@@ -228,7 +235,7 @@ class ApiProblemTest extends TestCase
     {
         $exception = new Exception\DomainException('exception message', 401);
         $exception->setAdditionalDetails(['foo' => 'bar']);
-        $apiProblem = new ApiProblem('401', $exception);
+        $apiProblem = new ProblemDetails('401', $exception);
         $payload = $apiProblem->toArray();
         $this->assertArrayHasKey('foo', $payload);
         $this->assertEquals('bar', $payload['foo']);
@@ -252,7 +259,7 @@ class ApiProblemTest extends TestCase
     public function testInvalidHttpStatusCodesAreCastTo500($code)
     {
         $e = new \Exception('Testing', $code);
-        $problem = new ApiProblem($code, $e);
+        $problem = new ProblemDetails($code, $e);
         $this->assertEquals(500, $problem->status);
     }
 }

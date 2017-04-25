@@ -4,7 +4,9 @@
  * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-namespace ZF\ApiProblem\Exception;
+declare(strict_types = 1);
+
+namespace ZF\ProblemDetails\Exception;
 
 class DomainException extends \DomainException implements
     ExceptionInterface,
@@ -39,9 +41,9 @@ class DomainException extends \DomainException implements
      * @param string $uri
      * @return self
      */
-    public function setType($uri)
+    public function setType(string $uri)
     {
-        $this->type = (string) $uri;
+        $this->type = $uri;
         return $this;
     }
 
@@ -49,9 +51,9 @@ class DomainException extends \DomainException implements
      * @param string $title
      * @return self
      */
-    public function setTitle($title)
+    public function setTitle(string $title)
     {
-        $this->title = (string) $title;
+        $this->title = $title;
         return $this;
     }
 
@@ -66,7 +68,7 @@ class DomainException extends \DomainException implements
     /**
      * @return string
      */
-    public function getType()
+    public function getType() : ?string
     {
         return $this->type;
     }
@@ -74,7 +76,7 @@ class DomainException extends \DomainException implements
     /**
      * @return string
      */
-    public function getTitle()
+    public function getTitle() : ?string
     {
         return $this->title;
     }

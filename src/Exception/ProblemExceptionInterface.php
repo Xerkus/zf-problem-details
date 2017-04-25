@@ -5,7 +5,9 @@
  * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-namespace ZF\ApiProblem\Exception;
+declare(strict_types = 1);
+
+namespace ZF\ProblemDetails\Exception;
 
 /**
  * Interface for exceptions that can provide additional API Problem details.
@@ -20,10 +22,10 @@ interface ProblemExceptionInterface
     /**
      * @return string
      */
-    public function getType();
+    public function getType() : ?string;
 
     /**
      * @return string
      */
-    public function getTitle();
+    public function getTitle() : ?string;
 }
