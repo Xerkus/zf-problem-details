@@ -1,5 +1,5 @@
 {
-    "name": "zfcampus/zf-problem-detail",
+    "name": "zfcampus/zf-problem-details",
     "description": "PSR7 implementation for RFC 7807 Problem Details for HTTP APIs",
     "type": "library",
     "license": "BSD-3-Clause",
